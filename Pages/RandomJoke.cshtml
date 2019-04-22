@@ -1,0 +1,12 @@
+@page
+@model RandomJokeModel
+@{
+    ViewData["Title"] = "Random Jokes";
+}
+<h1>@ViewData["Title"]</h1>
+
+<p>@Model.RandomJoke.joke</p>
+
+<script type="text/javascript">
+    setInterval('window.location.reload()', 10000);
+</script>

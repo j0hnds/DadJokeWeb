@@ -1,0 +1,42 @@
+@page
+@model JokeSearchModel
+@using System.Text.RegularExpressions
+@{
+    ViewData["Title"] = "Joke Search";
+}
+<h1>@ViewData["Title"]</h1>
+
+<form action="/JokeSearch" method="GET">
+  First name: <input type="text" name="term" value="@Model.SearchTerm">
+  <input type="submit" value="Search">
+</form>
+
+<hr>
+
+@if (@Model.ShortJokes != null && @Model.ShortJokes.Count > 0) {
+  <h2>Short Jokes</h2>
+  <ul>
+  @foreach (var j in @Model.ShortJokes)
+  {
+      <li>@Html.Raw(@Regex.Replace(j, $"({@Model.SearchTerm})" ,"<span class='text-danger'>$1</span>", RegexOptions.IgnoreCase))</li>
+  }
+  </ul>
+}
+@if (@Model.MediumJokes != null && @Model.MediumJokes.Count > 0) {
+  <h2>Medium Length Jokes</h2>
+  <ul>
+  @foreach (var j in @Model.MediumJokes)
+  {
+      <li>@Html.Raw(@Regex.Replace(j, $"({@Model.SearchTerm})" ,"<span class='text-danger'>$1</span>", RegexOptions.IgnoreCase))</li>
+  }
+  </ul>
+}
+@if (@Model.LongJokes != null && @Model.LongJokes.Count > 0) {
+  <h2>Long Jokes</h2>
+  <ul>
+  @foreach (var j in @Model.LongJokes)
+  {
+      <li>@Html.Raw(@Regex.Replace(j, $"({@Model.SearchTerm})" ,"<span class='text-danger'>$1</span>", RegexOptions.IgnoreCase))</li>
+  }
+  </ul>
+}
