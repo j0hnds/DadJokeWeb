@@ -12,6 +12,7 @@ namespace DadJokeWeb.Pages
     public class JokeSearchModel : PageModel
     {
         private ICanHazDadJokeAPI iCHDJApi = new ICanHazDadJokeAPI();
+        private Regex validSearchRE = new Regex(@"^[\w'0-9]+$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         public List<string> ShortJokes { get; private set; }
         public List<string> MediumJokes { get; private set; }
         public List<string> LongJokes { get; private set; }
@@ -29,6 +30,18 @@ namespace DadJokeWeb.Pages
             if (SearchTerm == null)
             {
                 return;
+            }
+
+            // Make sure this is a 'valid' search term. I've decided that 'valid' means
+            // that the search term is a single word that may contain alphanumeric characters
+            // and an apostrophe.
+            if (! validSearchRE.IsMatch(SearchTerm))
+            {
+                // For now, if the search term isn't 'valid', I'll just mash it 
+                // down to an empty string. This situation should probably be
+                // handled in the UI, but - at a minimum - I want to not pass a
+                // bad search term along to the API.
+                SearchTerm = "";
             }
 
             Task<JokeSearchResults> task = iCHDJApi.SearchForJokesAsync(SearchTerm);
