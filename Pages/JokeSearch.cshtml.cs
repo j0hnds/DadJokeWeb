@@ -23,33 +23,8 @@ namespace DadJokeWeb.Pages
             return Regex.Matches(str, @"(([\w'0-9]+(\s*)))").Count;
         }
 
-        public void OnGet()
+        private void OrganizeJokes(JokeSearchResults searchResults)
         {
-            SearchTerm = Request.Query["term"];
-
-            if (SearchTerm == null)
-            {
-                return;
-            }
-
-            // Make sure this is a 'valid' search term. I've decided that 'valid' means
-            // that the search term is a single word that may contain alphanumeric characters
-            // and an apostrophe.
-            if (! validSearchRE.IsMatch(SearchTerm))
-            {
-                // For now, if the search term isn't 'valid', I'll just mash it 
-                // down to an empty string. This situation should probably be
-                // handled in the UI, but - at a minimum - I want to not pass a
-                // bad search term along to the API.
-                SearchTerm = "";
-            }
-
-            Task<JokeSearchResults> task = iCHDJApi.SearchForJokesAsync(SearchTerm);
-
-            task.Wait();
-
-            JokeSearchResults searchResults = task.Result;
-
             ShortJokes = new List<string>();
             MediumJokes = new List<string>();
             LongJokes = new List<string>();
@@ -70,7 +45,38 @@ namespace DadJokeWeb.Pages
                     LongJokes.Add(j.joke);
                 }
             }
+        }
 
+        public void OnGet()
+        {
+            SearchTerm = Request.Query["term"];
+
+            if (SearchTerm == null)
+            {
+                // If the SearchTerm is null, this means (to me) that
+                // we are just entering the JokeSearch page with out
+                // the user having submitted a search form. So, we
+                // don't want to hit the API under these circumstances.
+                return;
+            }
+
+            // Make sure this is a 'valid' search term. I've decided that 'valid' means
+            // that the search term is a single word that may contain alphanumeric characters
+            // and an apostrophe.
+            if (! validSearchRE.IsMatch(SearchTerm))
+            {
+                // For now, if the search term isn't 'valid', I'll just mash it 
+                // down to an empty string. This situation should probably be
+                // handled in the UI, but - at a minimum - I want to not pass a
+                // bad search term along to the API.
+                SearchTerm = "";
+            }
+
+            Task<JokeSearchResults> task = iCHDJApi.SearchForJokesAsync(SearchTerm);
+
+            task.Wait();
+
+            OrganizeJokes(task.Result);
         }
     }
 }
